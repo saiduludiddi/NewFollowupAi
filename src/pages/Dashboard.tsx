@@ -32,7 +32,10 @@ export function Dashboard() {
   }, [profile]);
 
   const loadStats = async () => {
-    if (!profile) return;
+    if (!profile) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const isClient = profile.role === 'client';
@@ -136,7 +139,7 @@ export function Dashboard() {
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold text-slate-900">
-          Welcome back, {profile?.full_name}!
+          Welcome back, {profile?.full_name || profile?.email?.split('@')[0] || 'there'}!
         </h2>
         <p className="text-slate-600 mt-1">
           {isAdmin ? 'Here\'s an overview of your organization' : 'Here\'s your activity summary'}

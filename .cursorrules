@@ -1,0 +1,211 @@
+You are an expert in TypeScript, React 18, Vite, React Router v7, Supabase, Tailwind CSS, and Lucide React.
+
+You are building FollowUp AI — an enterprise-grade automation engine for:
+- Document collection and verification
+- Compliance storage
+- Approvals (maker-checker)
+- Smart reminders (email, WhatsApp, SMS)
+- AI voice-based follow-up calls
+- Template-driven task and checklist automation with schedulers
+
+Key Principles
+
+- Write concise, technical responses with accurate TypeScript examples.
+- Use functional, declarative programming. Avoid classes.
+- Prefer iteration and modularization over duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading).
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+- Use the Receive an Object, Return an Object (RORO) pattern.
+
+JavaScript/TypeScript
+
+- Use "function" keyword for pure functions. Omit semicolons.
+- Use TypeScript for all code. Prefer interfaces over types. Avoid enums, use maps.
+- File structure: Exported component, subcomponents, helpers, static content, types.
+- Avoid unnecessary curly braces in conditional statements.
+- For single-line statements in conditionals, omit curly braces.
+- Use concise, one-line syntax for simple conditional statements (e.g., if (condition) doSomething()).
+
+Error Handling and Validation
+
+- Prioritize error handling and edge cases:
+  - Handle errors and edge cases at the beginning of functions.
+  - Use early returns for error conditions to avoid deeply nested if statements.
+  - Place the happy path last in the function for improved readability.
+  - Avoid unnecessary else statements; use if-return pattern instead.
+  - Use guard clauses to handle preconditions and invalid states early.
+  - Implement proper error logging and user-friendly error messages.
+  - Always set loading states to false in finally blocks or when early returning.
+  - Handle null/undefined profile/auth states gracefully with early returns and loading state management.
+
+React/Vite
+
+- Use functional components and TypeScript interfaces.
+- Use declarative JSX.
+- Use function, not const, for components.
+- Implement responsive design with Tailwind CSS.
+- Use mobile-first approach for responsive design.
+- Place static content and interfaces at file end.
+- Use content variables for static content outside render functions.
+- Minimize 'useEffect' and 'setState'. Prefer derived state and React Query patterns when appropriate.
+- Use React Context for global state (auth, theme, etc.).
+- Wrap async operations in try-catch with proper error handling.
+- Always handle loading states properly - set loading to false in finally blocks or when profile/auth is null.
+
+React Router
+
+- Use React Router v7 for client-side routing.
+- Implement protected routes using wrapper components (ProtectedRoute pattern).
+- Use role-based access control with allowedRoles prop.
+- Wrap protected routes with layout components (DashboardLayout).
+- Use Navigate component for redirects.
+- Handle route parameters and query strings appropriately.
+
+Supabase Integration
+
+- Use Supabase client from lib/supabase.ts for all database operations.
+- Always handle Supabase errors gracefully with try-catch blocks.
+- Use TypeScript types generated from Supabase schema (types/database.ts).
+- Implement Row Level Security (RLS) policies correctly - avoid infinite recursion in policies.
+- Use security definer functions when needed to bypass RLS for organization checks.
+- Always check for null profile/auth before making Supabase queries.
+- Use proper error handling for Supabase operations - log errors and show user-friendly messages.
+- Use .maybeSingle() for queries that might return null.
+- Use .single() for queries that must return exactly one result.
+
+Project Structure
+
+- src/
+  - components/ - Reusable UI components (e.g., DashboardLayout, ProtectedRoute)
+  - contexts/ - React Context providers (e.g., AuthContext)
+  - lib/ - Utility functions and client configurations (e.g., supabase.ts)
+  - pages/ - Page components (e.g., Dashboard, Login, MyRequests)
+  - types/ - TypeScript type definitions (e.g., database.ts)
+
+Core Features & Database Tables
+
+1. Template & Checklist Engine
+   - templates: Reusable templates with linked tasks and scheduler configuration
+   - template_categories: Categories (GST, Income Tax, KYC, HR, Vendor, Loan)
+   - template_checklist_items: Document/data requirements per template
+   - Fields: name, category, task_type, scheduler config, default assignee, priority, SLA, visibility
+
+2. Task Management (One-Time & Recurring)
+   - tasks: Master tasks with scheduler configuration
+   - task_occurrences: Auto-generated instances of recurring tasks
+   - task_assignments: Team member assignments
+   - task_checklist_items: Subtasks linked to template checklist items
+   - Fields: task_type, frequency, day_rule, start_date, end_date, next_run_date, status
+
+3. Data Request Generator
+   - data_requests: Client-specific document/information requests
+   - request_checklist_items: Items to collect per request with status tracking
+   - Fields: request_number, template_id, task_id, client_id, due_date, communication channels
+
+4. Smart Document Re-Use
+   - document_matches: Tracks existing documents that match required items
+   - Auto-links documents from vault to new requests
+   - Shows only missing documents to clients
+
+5. Client Vault
+   - documents: Document metadata with AI extraction and version tracking
+   - client_folders: Folder structure (KYC, Legal, Finance, HR, Project-wise)
+   - document_versions: Version history
+   - Fields: upload_source, AI classification, verification status, shareable links
+
+6. Multi-Source Upload
+   - upload_sessions: Tracks uploads from multiple sources
+   - Supported sources: local, mobile_camera, gmail, whatsapp, google_drive
+   - Fields: upload_source, source_reference_id, session_status, metadata
+
+7. AI Document Classification & Extraction
+   - documents.extracted_data: JSONB field with extracted fields
+   - documents.ai_classification_type: Detected document type
+   - documents.ai_extraction_status: Processing status
+   - ai_verification_results: Verification results and comparisons
+
+8. AI Verification
+   - ai_verification_results: Compares extracted data across documents
+   - documents.verification_flags: Flags mismatches and issues
+   - documents.mismatch_details: Details of data inconsistencies
+   - Checks expiry dates, marks expired/expiring soon
+
+9. Approvals (Maker-Checker)
+   - approvals: Approval workflow records
+   - request_checklist_items.status: Tracks approval status
+   - Full audit trail for all actions
+
+10. Notifications & Reminders
+    - reminders: Scheduled reminders with retry logic
+    - notifications: In-app notifications
+    - Channels: email, whatsapp, sms, voice, in_app
+    - Fields: scheduled_at, channel, retry_count, next_retry_at
+
+11. Voice Agent Integration
+    - voice_call_logs: Call records with transcripts and outcomes
+    - Fields: transcript, call_outcome, response_outcome, expected_submission_date, delay_reason, alternative_contact, documents_ready_confirmation, preferred_reminder_channel
+    - webhook_endpoints: Webhook configuration for voice providers (Twilio, Exotel, Kaleyra)
+    - external_integrations: Integration credentials for voice APIs
+
+12. Shareable Links
+    - shareable_links: Secure links with expiry and access control
+    - Fields: link_token, expires_at, max_access_count, permissions, password_hash
+    - Supports document, request, folder, and task sharing
+
+13. External Integrations
+    - external_integrations: Gmail, Google Drive, WhatsApp, Voice APIs
+    - webhook_endpoints: Webhook configuration for events
+    - Fields: integration_type, credentials_encrypted, settings, last_sync_at
+
+Authentication & Authorization
+
+- Use AuthContext for managing authentication state.
+- Check profile and user state before making authenticated requests.
+- Implement role-based access control using ProtectedRoute component.
+- Handle loading states during auth initialization.
+- Always check if profile exists before accessing profile properties.
+- Support OTP-based login for external users (via Supabase Auth).
+
+Data Fetching Patterns
+
+- Use useEffect for data fetching in components.
+- Always check if profile/auth exists before fetching data.
+- Set loading state to false in finally blocks or when profile is null.
+- Handle empty states gracefully with appropriate UI messages.
+- Use proper TypeScript types from database schema.
+
+UI/UX Guidelines
+
+- Use Tailwind CSS for all styling.
+- Use Lucide React for icons.
+- Implement loading states with spinners for async operations.
+- Show empty states when no data is available.
+- Use consistent spacing and typography from Tailwind.
+- Implement responsive design with mobile-first approach.
+- Use semantic HTML elements.
+- Ensure proper accessibility with ARIA labels when needed.
+- Design beautiful, production-ready interfaces (not cookie-cutter).
+
+Key Conventions
+
+1. Always handle loading states properly - never leave components stuck in loading state.
+2. Check for null/undefined values before accessing properties (especially profile, user).
+3. Use early returns for error conditions and null checks.
+4. Set loading to false in finally blocks or when early returning from async functions.
+5. Use TypeScript interfaces from types/database.ts for database types.
+6. Implement proper error boundaries and error handling.
+7. Use React Router for navigation, not window.location.
+8. Keep components focused and single-purpose.
+9. Extract reusable logic into custom hooks or utility functions.
+10. Use Supabase RLS policies correctly - avoid recursive policy checks.
+11. Track document upload sources (local, mobile, Gmail, WhatsApp, Google Drive).
+12. Implement AI classification and extraction workflows.
+13. Handle voice agent call flows and webhook events.
+14. Support shareable links with expiry and access control.
+15. Implement smart document re-use logic.
+16. Handle multi-source upload sessions.
+17. Track AI verification results and flag mismatches.
+18. Link task checklist items to template items and occurrences.
+
+Refer to React Router v7, Supabase, and Tailwind CSS documentation for best practices.
